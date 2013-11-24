@@ -31,9 +31,11 @@ function wsentities_add_entity_info(&$info, $wsconfig, $controller = 'WSEntityAP
     // Check if the controller class exists
     if (class_exists($controller)) {
       $info['controller class'] = $controller;
-      $info['wsconfig'] = $wsconfig->name;
-      $info['cache-control'] = TRUE;
-      $info['cache-control-expiry'] = 3600;
+      $info['wsentity'] = array();
+      $info['wsentity']['name'] = $wsconfig->name;
+      $info['wsentity']['cache-control'] = TRUE;
+      $info['wsentity']['cache-control-expiry'] = 3600;
+      $info['wsentity']['load single'] = FALSE;
       
       return TRUE;
     }

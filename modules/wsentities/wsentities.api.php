@@ -27,10 +27,13 @@ function hook_entity_info() {
 
   $info = array(
     '...',
-    'controller class' => 'WSEntityAPIController', // Required. Entity controller designed for use with web services.
-    'wsconfig' => 'wsconfig_machine_name', // Required. Name of the wsconfig instance responsible for all data operations for this entity type.
-    'cache-control' => TRUE, // Optional. Whether to respect the cache-control headers returned
-    'cache-control-expiry' => 3600, // Optional. If cache-control is set to FALSE, how long to cache items for.
+    'wsentity' => array(
+      'controller class' => 'WSEntityAPIController', // Required. Entity controller designed for use with web services.
+      'wsconfig' => 'wsconfig_machine_name', // Required. Name of the wsconfig instance responsible for all data operations for this entity type.
+      'cache-control' => TRUE, // Optional. Whether to respect the cache-control headers returned
+      'cache-control-expiry' => 3600, // Optional. If cache-control is set to FALSE, how long to cache items for.
+      'load single' => TRUE, // Whether the controller should load entities in a single query (i.e. index, search) or multiple queries. Default TRUE.
+    )
     '...',
   );
 }

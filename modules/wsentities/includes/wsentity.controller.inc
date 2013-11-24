@@ -10,20 +10,33 @@
  * Interface for WSEntityControllers compatible with the entity API.
  */
 interface WSEntityAPIControllerInterface extends EntityAPIControllerInterface {
-  // @todo add functions for loading wsconfig info
+  /**
+   * Load single entity
+   * 
+   * Web services which don't offer an index method will instead load entities using
+   * multiple loadSingle() calls.
+   *
+   * Also a single object call to a web services can be cached on the remote end more
+   * easily than a group of arbitrary entities. 
+   */
+  public function loadSingle($id);
+  
+  /**
+   * Validate that the entity supports the given operation
+   * 
+   * @param string $op
+   *  Operation as defined in the wsconfig
+   * @return boolean
+   *  Returns TRUE if the operation is available, FALSE otherwise.
+   */
+  public function hasOperation($op);
 }
 
 /**
  * WSEntityAPIController extends and overrides most EntityAPIController features
  **/
 class WSEntityAPIController implements WSEntityAPIControllerInterface {
-
-  /**
-   * Loads the name of the wsconfig as defined in hook_entity_info().
-   */
-  protected function loadWsConfig() {
-    
-  }
+  protected $wsconfig;
 
   /**
    * Constructor.
@@ -32,7 +45,9 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    *   The entity type for which the instance is created.
    */
   public function __construct($entityType) {
-    // @todo
+    if (empty($this->wsconfig)) {
+      $this->wsconfig = wsconfig_load_by_name($this->entityInfo['wsconfig']);
+    }
   }
 
   /**
@@ -59,8 +74,37 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    *   found, an empty array is returned.
    */
   public function load($ids = array(), $conditions = array()) {
-    // @todo
+    $entities = array();
+    
+    if ($this->entityInfo['wsentity']['load single'] or count($ids) == 1) {
+      foreach ($ids as $id) {
+        $entity = $this->loadSingle($id);
+        // Check if the load was successfull
+        if (FALSE !== $entity) {
+          $entities[] = $entity;          
+        }
+      }
+    }
+    else {
+      // @todo
+    }
+      
+    return $entities;
   }
+  
+  /**
+   * Loads a single entity
+   * 
+   * @param mixed $id
+   *  Entity Id
+   * @return object
+   *  Returns an entity object, FALSE otherwise.
+   */
+  public function loadSingle($id) {
+    // @todo make wsconfig call
+    return FALSE;
+  }
+  
   
   /**
    * Delete permanently saved entities.
@@ -184,5 +228,19 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    */
   public function view($entities, $view_mode = 'full', $langcode = NULL, $page = NULL) {
     // @todo
+  }
+
+  /**
+   * Validate that the entity supports the given operation
+   * 
+   * @param string $op
+   *  Operation as defined in the wsconfig
+   *    Ex: load, update, insert, delete, index
+   * @return boolean
+   *  Returns TRUE if the operation is available, FALSE otherwise.
+   */  
+  public function hasOperation($op) {
+    $ops = $this->wsconfig->getOperations();
+    return in_array($op, $ops);
   }
 }
