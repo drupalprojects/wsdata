@@ -9,23 +9,25 @@
 /**
  * Interface for WSEntityControllers compatible with the entity API.
  */
-interface WSEntityAPIControllerInterface extends EntityAPIControllerInterface {
+interfaceWSEntityAPIControllerInterface extends EntityAPIControllerInterface {
+
   /**
    * Load single entity
-   * 
+   *
    * Web services which don't offer an index method will instead load entities using
    * multiple loadSingle() calls.
    *
    * Also a single object call to a web services can be cached on the remote end more
-   * easily than a group of arbitrary entities. 
+   * easily than a group of arbitrary entities.
    */
   public function loadSingle($id);
-  
+
   /**
    * Validate that the entity supports the given operation
-   * 
+   *
    * @param string $op
    *  Operation as defined in the wsconfig
+   *
    * @return boolean
    *  Returns TRUE if the operation is available, FALSE otherwise.
    */
@@ -35,7 +37,7 @@ interface WSEntityAPIControllerInterface extends EntityAPIControllerInterface {
 /**
  * WSEntityAPIController extends and overrides most EntityAPIController features
  **/
-class WSEntityAPIController implements WSEntityAPIControllerInterface {
+class WSEntityAPIControllerimplementsWSEntityAPIControllerInterface {
   protected $wsconfig;
 
   /**
@@ -57,7 +59,7 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    *   (optional) If specified, the cache is reset for the entities with the
    *   given ids only.
    */
-  public function resetCache(array $ids = NULL) {
+  public function resetCache(array$ids = NULL) {
     // @todo
   }
 
@@ -75,28 +77,29 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    */
   public function load($ids = array(), $conditions = array()) {
     $entities = array();
-    
+
     if ($this->entityInfo['wsentity']['load single'] or count($ids) == 1) {
       foreach ($ids as $id) {
         $entity = $this->loadSingle($id);
         // Check if the load was successfull
         if (FALSE !== $entity) {
-          $entities[] = $entity;          
+          $entities[] = $entity;
         }
       }
     }
     else {
       // @todo
     }
-      
+
     return $entities;
   }
-  
+
   /**
    * Loads a single entity
-   * 
+   *
    * @param mixed $id
    *  Entity Id
+   *
    * @return object
    *  Returns an entity object, FALSE otherwise.
    */
@@ -104,8 +107,7 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
     // @todo make wsconfig call
     return FALSE;
   }
-  
-  
+
   /**
    * Delete permanently saved entities.
    *
@@ -147,10 +149,11 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    *
    * @param array $values
    *   An array of values to set, keyed by property name.
+   *
    * @return
    *   A new instance of the entity type.
    */
-  public function create(array $values = array()) {
+  public function create(array$values = array()) {
     // @todo
   }
 
@@ -197,6 +200,7 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    * @param $langcode
    *   (optional) A language code to use for rendering. Defaults to the global
    *   content language of the current request.
+   *
    * @return
    *   The renderable array.
    */
@@ -223,6 +227,7 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    *   of the entity, as returned by entity_uri().
    *   This parameter is only supported for entities which controller is a
    *   EntityAPIControllerInterface.
+   *
    * @return
    *   The renderable array, keyed by entity name or numeric id.
    */
@@ -232,15 +237,17 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
 
   /**
    * Validate that the entity supports the given operation
-   * 
+   *
    * @param string $op
    *  Operation as defined in the wsconfig
    *    Ex: load, update, insert, delete, index
+   *
    * @return boolean
    *  Returns TRUE if the operation is available, FALSE otherwise.
-   */  
+   */
   public function hasOperation($op) {
     $ops = $this->wsconfig->getOperations();
     return in_array($op, $ops);
   }
 }
+
