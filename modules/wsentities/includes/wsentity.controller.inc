@@ -9,7 +9,7 @@
 /**
  * Interface for WSEntityControllers compatible with the entity API.
  */
-interfaceWSEntityAPIControllerInterface extends EntityAPIControllerInterface {
+interface WSEntityAPIControllerInterface extends EntityAPIControllerInterface {
 
   /**
    * Load single entity
@@ -37,7 +37,7 @@ interfaceWSEntityAPIControllerInterface extends EntityAPIControllerInterface {
 /**
  * WSEntityAPIController extends and overrides most EntityAPIController features
  **/
-class WSEntityAPIControllerimplementsWSEntityAPIControllerInterface {
+class WSEntityAPIController implements WSEntityAPIControllerInterface {
   protected $wsconfig;
 
   /**
