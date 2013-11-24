@@ -6,22 +6,44 @@
  */
 
 /**
- * Implements hook_permission().
+ * Helper function to add the new options to your entity info or entity info alter.
+ *
+ * @param array $info [reference]
+ *  Entity info
+ * @param object $wsconfig
+ *  Loaded wsconfig object or wsconfig id (name or numeric).
+ * @param string $controller [optional]
+ *  Controller class for entity
  */
-function wsentities_permission() {
-  return array(
-    'administer wsentities' =>  array(
-      'title' => t('Administer Web Service Entities'),
-      'description' => t('Perform administration tasks for Web Service Entities.'),
-    ),
-  );
+function wsentities_add_entity_info(&$info, $wsconfig, $controller = 'WSEntityAPIController') {
+  // Load by numeric ID
+  if (is_numeric($wsconfig)) {
+    $wsconfig = wsconfig_load($wsconfig);
+  }
+  elseif (is_string($wsconfig)) {
+    // Attempt to load by name
+    $wsconfig = wsconfig_load_by_name($wsconfig);
+  }
+
+  // We should have a wsconfig object by now, otheriwse time to give up.
+  if (isset($wsconfig->id)) {
+  
+    // Check if the controller class exists
+    if (class_exists($controller)) {
+      $info['controller class'] = $controller;
+      $info['wsconfig'] = $wsconfig->name;
+      $info['cache-control'] = TRUE;
+      $info['cache-control-expiry'] = 3600;
+      
+      return TRUE;
+    }
+  }  
+  return FALSE;
 }
 
 /**
- *  Implements hook_menu().
+ * Helper function to add new options to your entity property information
  */
-function wsentities_menu() {
-  $items = array();
-
-  return $items;
+function wsentities_add_entity_property_info() {
+  // @todo
 }

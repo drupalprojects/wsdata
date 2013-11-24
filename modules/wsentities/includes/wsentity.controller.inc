@@ -10,133 +10,179 @@
  * Interface for WSEntityControllers compatible with the entity API.
  */
 interface WSEntityAPIControllerInterface extends EntityAPIControllerInterface {
+  // @todo add functions for loading wsconfig info
 }
 
 /**
  * WSEntityAPIController extends and overrides most EntityAPIController features
  **/
-class WSEntityAPIController extends EntityAPIController implements WSEntityAPIControllerInterface {
+class WSEntityAPIController implements WSEntityAPIControllerInterface {
 
-  protected $cacheComplete = FALSE;
-  protected $bundleKey;
+  /**
+   * Loads the name of the wsconfig as defined in hook_entity_info().
+   */
+  protected function loadWsConfig() {
+    
+  }
 
-
+  /**
+   * Constructor.
+   *
+   * @param $entityType
+   *   The entity type for which the instance is created.
+   */
   public function __construct($entityType) {
-  /**
-     TODO: Load entity config object here
-     TODO: Find a method of finding out which config object goes with this entity.
-  **/
-
-
-    parent::__construct($entityType);
+    // @todo
   }
 
   /**
-   * WS Get's the entity
+   * Resets the internal, static entity cache.
+   *
+   * @param $ids
+   *   (optional) If specified, the cache is reset for the entities with the
+   *   given ids only.
    */
-  public function query($ids, $conditions, $revision_id = FALSE) {
-
-/*
-  TODO: WS RETRIEVE
-*/
-
-    return $result;
+  public function resetCache(array $ids = NULL) {
+    // @todo
   }
 
   /**
-   * Implements EntityAPIControllerInterface.
+   * Loads one or more entities.
    *
-   *  WS Delete's the entity
+   * @param $ids
+   *   An array of entity IDs, or FALSE to load all entities.
+   * @param $conditions
+   *   An array of conditions in the form 'field' => $value.
    *
-   * @param $transaction
-   *   Optionally a DatabaseTransaction object to use. Allows overrides to pass
-   *   in their transaction object.
+   * @return
+   *   An array of entity objects indexed by their ids. When no results are
+   *   found, an empty array is returned.
    */
-  public function delete($ids, DatabaseTransaction $transaction = NULL) {
-    $entities = $ids ? $this->load($ids) : FALSE;
-    if (!$entities) {
-      // Do nothing, in case invalid or no ids have been passed.
-      return;
-    }
-    // This transaction causes troubles on MySQL, see
-    // http://drupal.org/node/1007830. So we deactivate this by default until
-    // is shipped in a point release.
-    // $transaction = isset($transaction) ? $transaction : db_transaction();
-
-    try {
-      $ids = array_keys($entities);
-/*
-  TODO: WS delete
-
-      db_delete($this->entityInfo['base table'])
-        ->condition($this->idKey, $ids, 'IN')
-        ->execute();
-
-*/
-      // Reset the cache as soon as the changes have been applied.
-      $this->resetCache($ids);
-
-      foreach ($entities as $id => $entity) {
-        $this->invoke('delete', $entity);
-      }
-      // Ignore slave server temporarily.
-      db_ignore_slave();
-    }
-    catch (Exception $e) {
-      if (isset($transaction)) {
-        $transaction->rollback();
-      }
-      watchdog_exception($this->entityType, $e);
-      throw $e;
-    }
+  public function load($ids = array(), $conditions = array()) {
+    // @todo
+  }
+  
+  /**
+   * Delete permanently saved entities.
+   *
+   * In case of failures, an exception is thrown.
+   *
+   * @param $ids
+   *   An array of entity IDs.
+   */
+  public function delete($ids) {
+    // @todo
   }
 
   /**
-   * Implements EntityAPIControllerInterface.
-   *
-   * @param $transaction
-   *   Optionally a DatabaseTransaction object to use. Allows overrides to pass
-   *   in their transaction object.
+   * Invokes a hook on behalf of the entity. For hooks that have a respective
+   * field API attacher like insert/update/.. the attacher is called too.
    */
-  public function save($entity, DatabaseTransaction $transaction = NULL) {
-    $transaction = isset($transaction) ? $transaction : db_transaction();
-    try {
-      // Load the stored entity, if any.
-      if (!empty($entity->{$this->idKey}) && !isset($entity->original)) {
-        // In order to properly work in case of name changes, load the original
-        // entity using the id key if it is available.
-        $entity->original = entity_load_unchanged($this->entityType, $entity->{$this->idKey});
-      }
+  public function invoke($hook, $entity) {
+    // @todo
+  }
 
-      $this->invoke('presave', $entity);
+  /**
+   * Permanently saves the given entity.
+   *
+   * In case of failures, an exception is thrown.
+   *
+   * @param $entity
+   *   The entity to save.
+   *
+   * @return
+   *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
+   *   performed.
+   */
+  public function save($entity) {
+    // @todo
+  }
 
-      if (!empty($entity->{$this->idKey}) && empty($entity->is_new)) {
+  /**
+   * Create a new entity.
+   *
+   * @param array $values
+   *   An array of values to set, keyed by property name.
+   * @return
+   *   A new instance of the entity type.
+   */
+  public function create(array $values = array()) {
+    // @todo
+  }
 
-/*
-  TODO: WS PUT
-        $return = drupal_write_record($this->entityInfo['base table'], $entity, $this->idKey);
-*/
-        $this->resetCache(array($entity->{$this->idKey}));
-        $this->invoke('update', $entity);
-      }
-      else {
-/*
-  TODO: WS POST
-        $return = drupal_write_record($this->entityInfo['base table'], $entity);
-*/
-        $this->invoke('insert', $entity);
-      }
-      // Ignore slave server temporarily.
-      db_ignore_slave();
-      unset($entity->is_new);
-      unset($entity->original);
+  /**
+   * Exports an entity as serialized string.
+   *
+   * @param $entity
+   *   The entity to export.
+   * @param $prefix
+   *   An optional prefix for each line.
+   *
+   * @return
+   *   The exported entity as serialized string. The format is determined by
+   *   the controller and has to be compatible with the format that is accepted
+   *   by the import() method.
+   */
+  public function export($entity, $prefix = '') {
+    // @todo
+  }
 
-      return $return;
-    }
-    catch (Exception $e) {
-      $transaction->rollback();
-      watchdog_exception($this->entityType, $e);
-      throw $e;
-    }
+  /**
+   * Imports an entity from a string.
+   *
+   * @param string $export
+   *   An exported entity as serialized string.
+   *
+   * @return
+   *   An entity object not yet saved.
+   */
+  public function import($export) {
+    // @todo
+  }
+
+  /**
+   * Builds a structured array representing the entity's content.
+   *
+   * The content built for the entity will vary depending on the $view_mode
+   * parameter.
+   *
+   * @param $entity
+   *   An entity object.
+   * @param $view_mode
+   *   View mode, e.g. 'full', 'teaser'...
+   * @param $langcode
+   *   (optional) A language code to use for rendering. Defaults to the global
+   *   content language of the current request.
+   * @return
+   *   The renderable array.
+   */
+  public function buildContent($entity, $view_mode = 'full', $langcode = NULL) {
+    // @todo
+  }
+
+  /**
+   * Generate an array for rendering the given entities.
+   *
+   * @param $entities
+   *   An array of entities to render.
+   * @param $view_mode
+   *   View mode, e.g. 'full', 'teaser'...
+   * @param $langcode
+   *   (optional) A language code to use for rendering. Defaults to the global
+   *   content language of the current request.
+   * @param $page
+   *   (optional) If set will control if the entity is rendered: if TRUE
+   *   the entity will be rendered without its title, so that it can be embeded
+   *   in another context. If FALSE the entity will be displayed with its title
+   *   in a mode suitable for lists.
+   *   If unset, the page mode will be enabled if the current path is the URI
+   *   of the entity, as returned by entity_uri().
+   *   This parameter is only supported for entities which controller is a
+   *   EntityAPIControllerInterface.
+   * @return
+   *   The renderable array, keyed by entity name or numeric id.
+   */
+  public function view($entities, $view_mode = 'full', $langcode = NULL, $page = NULL) {
+    // @todo
   }
 }
