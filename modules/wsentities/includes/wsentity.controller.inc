@@ -79,12 +79,17 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
     $entities = array();
 
     if ($this->entityInfo['wsentity']['load single'] or count($ids) == 1) {
-      foreach ($ids as $id) {
-        $entity = $this->loadSingle($id);
-        // Check if the load was successfull
-        if (FALSE !== $entity) {
-          $entities[] = $entity;
-        }
+      if ($this->hasOperation('load')) {
+        foreach ($ids as $id) {
+          $entity = $this->loadSingle($id);
+          // Check if the load was successfull
+          if (FALSE !== $entity) {
+            $entities[] = $entity;
+          }
+        }        
+      }
+      else {
+        // @todo do we throw an exception here?
       }
     }
     else {
@@ -247,7 +252,13 @@ class WSEntityAPIController implements WSEntityAPIControllerInterface {
    */
   public function hasOperation($op) {
     $ops = $this->wsconfig->getOperations();
-    return in_array($op, $ops);
+    $supported = in_array($op, $ops);
+    
+    if (!$supported) {
+      watchdog('wsentities', 'wsconfig %wsconfig does not support %op operation', array('%wsconfig' => $this->wsconfig->name, '%op' => $op), WATCHDOG_WARNING);
+    }
+    
+    return $supported;
   }
 }
 
