@@ -120,7 +120,7 @@ function wsconfig_edit_form($form, &$form_state, $wsconfig, $op = 'edit') {
       '#type' => 'textfield',
       '#title' => t('Options'),
       '#description' => t('Options as a JSON array  (Example: {"headers":{"Content-Type":"application/json"}} )'),
-      '#default_value' => isset($form_state['values'][$op . '_options']) ? $form_state['values'][$op . '_options'] : isset($wsconfig->data['options'][$op]) ? drupal_json_encode($wsconfig->data['options'][$op]): '',
+      '#default_value' => isset($form_state['values'][$op . '_options']) ? $form_state['values'][$op . '_options'] : !empty($wsconfig->data['options'][$op]) ? drupal_json_encode($wsconfig->data['options'][$op]): '',
       '#element_validate' => array('_wsconfig_element_validate_json'),
     );
   }
@@ -365,7 +365,7 @@ function wsconfig_view_form($form, &$form_state, $wsconfig) {
         '#type' => 'textfield',
         '#title' => t('Options'),
         '#description' => t('Options as a JSON array  (Example: {"headers":{"Content-Type":"application/json"}} )'),
-        '#default_value' => isset($form_state['values']['options']) ? $form_state['values']['options'] : isset($wsconfig->data['options'][$op]) ? drupal_json_encode($wsconfig->data['options'][$op]): '',
+        '#default_value' => isset($form_state['values']['options']) ? $form_state['values']['options'] : !empty($wsconfig->data['options'][$op]) ? drupal_json_encode($wsconfig->data['options'][$op]): '',
         '#element_validate' => array('_wsconfig_element_validate_json'),
       );
 
