@@ -337,7 +337,7 @@ function wsfields_data_write($entity_type, $entity, $op, $field, $items) {
 
   // Load required settings from the field instance
   $wsconfig_name = $field['storage']['settings']['wsconfig_name'];
-  $remotename = $field['storage']['settings']['remotekey'];
+  $remotekey = $field['storage']['settings']['remotekey'];
   $passaccepts = isset($field['storage']['settings']['passaccepts']) ? $field['storage']['settings']['passaccepts'] : TRUE;
   $processor = $field['storage']['settings']['processor'];
   $propertymap = $field['storage']['settings']['propertymap']['read'];
@@ -363,9 +363,11 @@ function wsfields_data_write($entity_type, $entity, $op, $field, $items) {
       $value = FALSE;
       if (isset($ws_keys[$entity_property])) {
         $value = $ws_keys[$entity_property];
-      } elseif (isset($entity->$entity_property)) {
+      }
+      elseif (isset($entity->$entity_property)) {
         $value = $entity->$entity_property;
-      } else {
+      }
+      else {
         if (WSFIELDS_DEBUG) debug("Couldn't find pattern: " . $pattern);
         return FALSE;
       }
@@ -401,6 +403,17 @@ function wsfields_data_write($entity_type, $entity, $op, $field, $items) {
         // Select the first option
         // @todo come up with a way for the objects to decide which accept type it should use
         $options['accept-type'] = array_pop($type);
+      }
+
+      // Key the items based on the remote key
+      if (count($items) > 1) {
+        // @todo
+      }
+      else {
+        $items = reset($items);
+        // @todo figure out how to support fields with different column names
+        $items[$remotekey] = $items['value'];
+        unset($items['value']);
       }
 
       // Write the data
