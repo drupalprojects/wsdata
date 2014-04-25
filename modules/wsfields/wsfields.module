@@ -327,7 +327,7 @@ function wsfields_data_load($entity_type, $field, $entity) {
  * @return array|boolean
  *  Returns the formatted field data, FALSE otherwise.
  */
-function wsfields_data_write($entity_type, $entity, $op, $fields, $items) {
+function wsfields_data_write($entity_type, $entity, $op, $field, $items) {
   if (WSFIELDS_DEBUG) debug("WSFields loading " . $entity->type . "->" . $field['field_name'] . " of type " . $field['type']);
 
   if (!isset($field['storage']['settings']['wsconfig_name'])) {
@@ -342,23 +342,14 @@ function wsfields_data_write($entity_type, $entity, $op, $fields, $items) {
   $processor = $field['storage']['settings']['processor'];
   $propertymap = $field['storage']['settings']['propertymap']['read'];
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-  $cid = 'wsfield:' . $entity_type . ':' . $id . ':' . $field['field_name'];
-  $expirecid = 'wsfield_expire:' . $entity_type . ':' . $id;
-
-  $cachefield = cache_get($cid, 'cache_field');
-  if ($cachefield) {
-    return $cachefield->data;
-  }
-
   // Load the web service configuration
   $wsconfig = wsconfig_load_by_name($wsconfig_name);
 
   if (!is_object($wsconfig)) {
     if (WSFIELDS_DEBUG) debug("Couldn't find wsconfig: " . $wsconfig_name);
     return FALSE;
-  } else {
-
+  }
+  else {
     // Replace the tokens in the "read" pattern with entity property values
     $ws_keys = array();
     if ( isset($entity->ws_keys) and !empty($entity->ws_keys)) {
