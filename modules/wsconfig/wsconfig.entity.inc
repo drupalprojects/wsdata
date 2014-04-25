@@ -67,8 +67,9 @@ class WsConfig extends Entity {
    * Method for calling a webservice method.
    */
   public function call($type, $replacement = array(), $argument = array(), $options = array(), &$method = '') {
-    if (isset($this->data['options']) and is_array($this->data['options'])) {
-      $options += $this->data['options'][$this->getMethodKey($type)];
+    if (isset($this->data['options']) and is_array($this->data['options']) and is_array($options)) {
+      $this->data['options'][$this->getMethodKey($type)] = $this->getMethodKey($type);
+      $options += $this->data['options'];
     }
 
     $replacements = $this->getReplacements($type);
