@@ -256,7 +256,7 @@ function wsconfig_edit_form_submit(&$form, &$form_state) {
     $wsconfig->data[$op] = $wsconfig->$op;
 
     // Save the defined options if any
-    if (!empty($form_state['values'][$op . '_options'])) {
+    if (isset($form_state['values'][$op . '_options'])) {
       $wsconfig->data['options'][$op] = drupal_json_decode($form_state['values'][$op . '_options']);
     }
   }
